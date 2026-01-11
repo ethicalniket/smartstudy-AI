@@ -1,5 +1,3 @@
-ठीक है. नीचे FINAL, CLEAN, COPY-PASTE READY README.md दे रहा हूँ.
-कोई theory नहीं, कोई confusion नहीं. सीधा GitHub level README.
 📚 SmartStudy AI
 SmartStudy AI is a full-stack academic assistant platform that helps students upload study materials (PDFs), manage content securely, and later generate summaries, notes, and important questions using AI.
 This repository contains both backend and frontend in a single structured project to clearly show project evolution from start to current stage.
