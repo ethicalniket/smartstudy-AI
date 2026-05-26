@@ -419,14 +419,6 @@ const dropdownItem = {
     "1px solid #e2e8f0"
 };
 
-const logoutBtn = {
-  background: "#ef4444",
-  color: "white",
-  border: "none",
-  padding: "8px 14px",
-  borderRadius: "6px",
-  cursor: "pointer"
-};
 
 const pageContent = {
   padding: "25px",

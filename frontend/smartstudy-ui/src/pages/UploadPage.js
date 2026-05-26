@@ -29,7 +29,7 @@ const [timerActive, setTimerActive] =
 
 const [showResult, setShowResult] =
   useState(false);
-const [darkMode, setDarkMode] =
+const [darkMode] =
   useState(
 
     localStorage.getItem(
@@ -138,7 +138,7 @@ const [uploading, setUploading] =
   useEffect(() => {
 
     fetchFiles();
-
+// eslint-disable-next-line
   }, []);
   useEffect(() => {
 

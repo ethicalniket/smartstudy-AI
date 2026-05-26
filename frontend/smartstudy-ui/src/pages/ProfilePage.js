@@ -63,7 +63,7 @@ function ProfilePage() {
   useEffect(() => {
 
     fetchProfile();
-
+// eslint-disable-next-line
   }, []);
 
   const fetchProfile =
