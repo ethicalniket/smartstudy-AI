@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7466d82a-0605-4901-8767-ba767da11ad9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/smartstudy-ui/src/layouts/DashboardLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/smartstudy-ui/src/layouts/DashboardLayout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/smartstudy-ui/src/pages/UploadPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/smartstudy-ui/src/pages/UploadPage.js" afterDir="false" />
-    </list>
+    <list default="true" id="7466d82a-0605-4901-8767-ba767da11ad9" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
