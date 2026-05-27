@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
-
+import axiosInstance from "../services/axiosInstance";
 import {
   FaFilePdf,
   FaBookOpen,
@@ -18,6 +17,14 @@ function DashboardHome() {
 
   const [recentFiles, setRecentFiles] =
     useState([]);
+    const userName =
+      localStorage.getItem("userName");
+
+    const formattedName =
+      userName
+        ? userName.charAt(0).toUpperCase() +
+          userName.slice(1).toLowerCase()
+        : "Student";
 
   useEffect(() => {
 
@@ -29,9 +36,9 @@ function DashboardHome() {
 
     try {
 
-      const res = await axios.get(
+      const res = await axiosInstance.get(
 
-        "http://localhost:8080/api/dashboard/stats",
+        "dashboard/stats",
 
         {
 
@@ -117,10 +124,12 @@ function DashboardHome() {
 
         {/* LEFT */}
 
-        <div>
+        <div style={{ flex: 1 }}>
 
           <h1 style={heading}>
-            Welcome back, Niket 👋
+
+            Welcome back, {formattedName} 👋
+
           </h1>
 
           <p style={subheading}>
@@ -133,7 +142,7 @@ function DashboardHome() {
 
         <div style={aiCard}>
 
-          <div>
+          <div style={{ flex: 1 }}>
 
             <h2 style={aiTitle}>
               Ask AI Anything
@@ -293,6 +302,7 @@ function DashboardHome() {
                 </div>
 
               </Link>
+
               {/* STUDY */}
 
               <Link
@@ -497,7 +507,7 @@ function DashboardHome() {
 
 const container = {
 
-  padding: "24px",
+  padding: "20px",
 
   width: "100%",
 
@@ -515,7 +525,7 @@ const heroSection = {
 
   justifyContent: "space-between",
 
-  alignItems: "center",
+  alignItems: "stretch",
 
   gap: "24px",
 
@@ -528,7 +538,7 @@ const heroSection = {
 const heading = {
 
   fontSize:
-    "clamp(36px,5vw,58px)",
+    "clamp(32px,5vw,58px)",
 
   fontWeight: "800",
 
@@ -536,13 +546,16 @@ const heading = {
 
   marginBottom: "10px",
 
-  lineHeight: "1.1"
+  lineHeight: "1.1",
+
+  wordBreak: "break-word"
 
 };
 
 const subheading = {
 
-  fontSize: "20px",
+  fontSize:
+    "clamp(16px,2vw,20px)",
 
   color: "#64748b"
 
@@ -552,9 +565,9 @@ const aiCard = {
 
   flex: "1",
 
-  minWidth: "320px",
+  minWidth: "280px",
 
-  maxWidth: "520px",
+  width: "100%",
 
   background:
     "linear-gradient(135deg,#4f46e5,#7c3aed)",
@@ -563,7 +576,7 @@ const aiCard = {
 
   borderRadius: "28px",
 
-  padding: "30px",
+  padding: "24px",
 
   display: "flex",
 
@@ -573,6 +586,10 @@ const aiCard = {
 
   gap: "20px",
 
+  flexWrap: "wrap",
+
+  overflow: "hidden",
+
   boxShadow:
     "0 12px 30px rgba(99,102,241,0.35)"
 
@@ -580,7 +597,8 @@ const aiCard = {
 
 const aiTitle = {
 
-  fontSize: "36px",
+  fontSize:
+    "clamp(28px,5vw,36px)",
 
   fontWeight: "800",
 
@@ -598,7 +616,9 @@ const aiText = {
 
 const robot = {
 
-  fontSize: "82px"
+  fontSize: "clamp(48px,10vw,82px)",
+
+  flexShrink: 0
 
 };
 
@@ -629,7 +649,7 @@ const statsGrid = {
   display: "grid",
 
   gridTemplateColumns:
-    "repeat(auto-fit,minmax(260px,1fr))",
+    "repeat(auto-fit,minmax(240px,1fr))",
 
   gap: "20px"
 
@@ -641,7 +661,7 @@ const statCard = {
 
   borderRadius: "24px",
 
-  padding: "28px",
+  padding: "24px",
 
   display: "flex",
 
@@ -706,7 +726,8 @@ const statIconBlue = {
 
 const statNumber = {
 
-  fontSize: "44px",
+  fontSize:
+    "clamp(36px,5vw,44px)",
 
   fontWeight: "800",
 
@@ -731,7 +752,7 @@ const mainGrid = {
   display: "grid",
 
   gridTemplateColumns:
-    "minmax(0,2fr) minmax(320px,1fr)",
+    "repeat(auto-fit,minmax(320px,1fr))",
 
   gap: "24px",
 
@@ -740,6 +761,7 @@ const mainGrid = {
   alignItems: "start"
 
 };
+
 const sectionCard = {
 
   background: "white",
@@ -763,7 +785,8 @@ const sectionHeader = {
 
 const sectionTitle = {
 
-  fontSize: "30px",
+  fontSize:
+    "clamp(24px,4vw,30px)",
 
   fontWeight: "800",
 
@@ -782,6 +805,9 @@ const sectionSub = {
 const quickGrid = {
 
   display: "grid",
+
+  gridTemplateColumns:
+    "repeat(auto-fit,minmax(240px,1fr))",
 
   gap: "16px"
 
@@ -807,7 +833,9 @@ const quickCard = {
 
   flexWrap: "wrap",
 
-  cursor: "pointer"
+  cursor: "pointer",
+
+  minHeight: "140px"
 
 };
 
@@ -855,7 +883,8 @@ const quickIconOrange = {
 
 const quickTitle = {
 
-  fontSize: "24px",
+  fontSize:
+    "clamp(20px,3vw,24px)",
 
   fontWeight: "800",
 
@@ -892,7 +921,9 @@ const tipRow = {
 
   alignItems: "center",
 
-  gap: "18px"
+  gap: "18px",
+
+  flexWrap: "wrap"
 
 };
 
@@ -904,7 +935,8 @@ const tipEmoji = {
 
 const tipTitle = {
 
-  fontSize: "26px",
+  fontSize:
+    "clamp(22px,4vw,26px)",
 
   fontWeight: "800"
 
@@ -943,7 +975,11 @@ const activityHeader = {
 
   alignItems: "center",
 
-  marginBottom: "22px"
+  marginBottom: "22px",
+
+  gap: "10px",
+
+  flexWrap: "wrap"
 
 };
 
@@ -969,7 +1005,9 @@ const activityItem = {
 
   alignItems: "center",
 
-  marginBottom: "18px"
+  marginBottom: "18px",
+
+  flexWrap: "wrap"
 
 };
 
@@ -989,7 +1027,9 @@ const activityIcon = {
 
   justifyContent: "center",
 
-  fontSize: "24px"
+  fontSize: "24px",
+
+  flexShrink: 0
 
 };
 
@@ -999,7 +1039,9 @@ const fileName = {
 
   fontWeight: "700",
 
-  color: "#0f172a"
+  color: "#0f172a",
+
+  wordBreak: "break-word"
 
 };
 
@@ -1029,6 +1071,10 @@ const streakCard = {
   justifyContent: "space-between",
 
   alignItems: "center",
+
+  flexWrap: "wrap",
+
+  gap: "20px",
 
   boxShadow:
     "0 12px 30px rgba(99,102,241,0.35)"
@@ -1062,7 +1108,7 @@ const streakText = {
 
 const fireIcon = {
 
-  fontSize: "82px"
+  fontSize: "clamp(48px,10vw,82px)"
 
 };
 

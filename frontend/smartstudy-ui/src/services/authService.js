@@ -126,6 +126,10 @@ export const login =
       res.data.token
 
     );
+    localStorage.setItem(
+      "userName",
+      res.data.name
+    );
 
     return res.data;
 

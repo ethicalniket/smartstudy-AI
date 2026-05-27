@@ -202,6 +202,11 @@ public class AuthController {
 
         }
 
+        System.out.println(
+                "JWT NAME => " +
+                        user.getName()
+        );
+
         String token =
 
                 jwtUtil.generateToken(
@@ -216,12 +221,14 @@ public class AuthController {
                         token,
 
                         "type",
-                        "Bearer"
+                        "Bearer",
+
+                        "name",
+                        user.getName()
 
                 )
 
         );
-
     }
 
     // =========================

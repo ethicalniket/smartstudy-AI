@@ -1614,11 +1614,23 @@ setTimeLeft(30);
 // ================= STYLES =================
 
 const container = {
-  padding: "18px",
+
+  padding: "clamp(12px,3vw,22px)",
+
   background: "#f1f5f9",
+
   minHeight: "100vh",
+
+  width: "100%",
+
   maxWidth: "1400px",
-  margin: "0 auto"
+
+  margin: "0 auto",
+
+  overflowX: "hidden",
+
+  boxSizing: "border-box"
+
 };
 
 const header = {
@@ -1626,8 +1638,18 @@ const header = {
 };
 
 const title = {
+
   color: "#0f172a",
-  marginBottom: "5px"
+
+  marginBottom: "5px",
+
+  fontSize:
+    "clamp(32px,6vw,52px)",
+
+  fontWeight: "800",
+
+  lineHeight: "1.1"
+
 };
 
 const subtitle = {
@@ -1635,42 +1657,77 @@ const subtitle = {
 };
 
 const uploadSection = {
+
   display: "flex",
+
   alignItems: "center",
+
   gap: "14px",
+
   flexWrap: "wrap",
+
   marginBottom: "22px",
+
   background: "white",
-  padding: "18px",
-  borderRadius: "18px",
+
+  padding: "22px",
+
+  borderRadius: "24px",
+
   boxShadow:
     "0 4px 14px rgba(0,0,0,0.05)"
+
 };
 
 const input = {
-  padding: "14px",
-  borderRadius: "12px",
-  border: "1px solid #dbeafe",
-  minWidth: "220px",
-  outline: "none",
-  fontSize: "15px",
-  background: "#f8fafc"
-};
 
+  padding: "14px",
+
+  borderRadius: "14px",
+
+  border: "1px solid #dbeafe",
+
+  minWidth: "220px",
+
+  width: "100%",
+
+  flex: 1,
+
+  outline: "none",
+
+  fontSize: "15px",
+
+  background: "#f8fafc",
+
+  boxSizing: "border-box"
+
+};
 const uploadBtn = {
-  background: "#2563eb",
+
+  background:
+    "linear-gradient(135deg,#2563eb,#4f46e5)",
+
   color: "white",
+
   border: "none",
-  padding: "10px 18px",
-  borderRadius: "6px",
-  cursor: "pointer"
+
+  padding: "14px 24px",
+
+  borderRadius: "14px",
+
+  cursor: "pointer",
+
+  fontWeight: "700",
+
+  minHeight: "52px"
+
 };
 
 const searchBar = {
 
   width: "100%",
 
-  height: "58px",
+  minHeight: "58px",
 
   padding: "0 20px",
 
@@ -1695,7 +1752,7 @@ const searchRow = {
   display: "grid",
 
   gridTemplateColumns:
-    "2fr 1fr 1fr",
+    "repeat(auto-fit,minmax(180px,1fr))",
 
   gap: "18px",
 
@@ -1733,13 +1790,20 @@ const miniStat = {
 };
 
 const emptyBox = {
+
   background: "white",
-  padding: "50px",
-  borderRadius: "12px",
+
+  padding: "clamp(26px,6vw,50px)",
+
+  borderRadius: "24px",
+
   textAlign: "center",
+
   marginTop: "40px",
+
   boxShadow:
     "0 4px 10px rgba(0,0,0,0.08)"
+
 };
 
 const subjectSection = {
@@ -1758,13 +1822,11 @@ const grid = {
   display: "grid",
 
   gridTemplateColumns:
-    "repeat(auto-fill, minmax(420px,420px))",
-
-  justifyContent: "start",
+    "repeat(auto-fit,minmax(320px,1fr))",
 
   gap: "24px",
 
-  alignItems: "start"
+  alignItems: "stretch"
 
 };
 
@@ -1778,12 +1840,22 @@ const questionCountInput = {
 };
 
 const resultBox = {
+
   marginTop: "35px",
+
   background: "white",
-  padding: "30px",
-  borderRadius: "20px",
+
+  padding: "clamp(18px,4vw,30px)",
+
+  borderRadius: "24px",
+
   boxShadow:
-    "0 4px 10px rgba(0,0,0,0.08)"
+    "0 4px 10px rgba(0,0,0,0.08)",
+
+  overflowX: "auto",
+
+  lineHeight: "1.8"
+
 };
 
 const loadingText = {
@@ -1805,15 +1877,24 @@ const modalOverlay = {
 };
 
 const quizModal = {
-    width: "90%",
-    maxWidth: "700px",
-  maxHeight: "80vh",
+
+  width: "95%",
+
+  maxWidth: "760px",
+
+  maxHeight: "88vh",
+
   overflowY: "auto",
+
   background: "white",
-  borderRadius: "16px",
-  padding: "25px",
+
+  borderRadius: "24px",
+
+  padding: "clamp(18px,4vw,28px)",
+
   boxShadow:
     "0 10px 30px rgba(0,0,0,0.2)"
+
 };
 
 const quizHeader = {
@@ -1859,14 +1940,27 @@ const generateBtn = {
   fontWeight: "bold"
 };
 const optionBtn = {
+
   width: "100%",
-  padding: "14px",
-  marginTop: "10px",
-  borderRadius: "10px",
+
+  padding: "16px",
+
+  marginTop: "12px",
+
+  borderRadius: "14px",
+
   border: "1px solid #cbd5e1",
+
   cursor: "pointer",
+
   textAlign: "left",
-  fontWeight: "bold"
+
+  fontWeight: "bold",
+
+  lineHeight: "1.6",
+
+  wordBreak: "break-word"
+
 };
 
 const nextBtn = {

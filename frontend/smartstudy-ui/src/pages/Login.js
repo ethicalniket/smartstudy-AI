@@ -83,7 +83,12 @@ const Login = () => {
       setLoading(true);
       setMessage("");
 
-      await login(email, password);
+      const data = await login(
+        email,
+        password
+      );
+
+      console.log(data);
 
       navigate("/dashboard");
     } catch (err) {
