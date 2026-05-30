@@ -53,6 +53,15 @@ function DashboardLayout() {
       return "Interview Mode";
 
     }
+    if (
+      location.pathname.includes(
+        "/ai-study"
+      )
+    ) {
+
+      return "AI Study Assistant";
+
+    }
 
     if (
       location.pathname.includes(
