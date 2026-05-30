@@ -304,7 +304,7 @@ const {
     <div
       style={{
         display: "flex",
-        height: "calc(100vh - 70px)",
+        minHeight: "calc(100vh - 70px)",
         background:
           "#f8fafc",
         overflow:
@@ -351,8 +351,11 @@ const {
           width:
             mobile
               ? "280px"
-              : "280px",
-
+              : "300px",
+          minWidth:
+            mobile
+              ? "280px"
+              : "300px",
           position:
             mobile
               ? "fixed"
@@ -444,7 +447,7 @@ const {
             )
           }
           style={{
-            width: "100%",
+            width: "calc(100% - 24px)",
             padding:
               "10px",
             marginBottom:
@@ -537,32 +540,37 @@ const {
 
         {/* HEADER */}
 
-        <div
-          style={{
-            background:
-              "#fff",
-            borderBottom:
-              "1px solid #e5e7eb",
-            padding:
-              "18px 25px",
-            fontWeight:
-              "700"
-          }}
-        >
-         🤖 AI Study Assistant
-        </div>
+        <div>
+          <div
+            style={{
+              fontSize: "22px",
+              fontWeight: "700"
+            }}
+          >
+            🤖 AI Study Assistant
+          </div>
 
+          <div
+            style={{
+              fontSize: "13px",
+              color: "#64748b",
+              marginTop: "4px"
+            }}
+          >
+            Learn from your uploaded notes
+          </div>
+        </div>
         {/* MESSAGES */}
 
-        <div
-          style={{
-            flex: 1,
-            overflowY:
-              "auto",
-            padding:
-              "25px"
-          }}
-        >
+       <div
+         style={{
+           flex: 1,
+           overflowY: "auto",
+           overflowX: "hidden",
+           padding: "25px",
+           maxWidth: "100%"
+         }}
+       >
 
           {
 
@@ -571,14 +579,19 @@ const {
               <div
                 style={{
                   maxWidth:
-                    "700px",
+                    "650px",
                   margin:
-                    "60px auto",
+                    "40px auto",
                   textAlign:
                     "center"
                 }}
               >
-                <h1>
+                <h1
+                  style={{
+                    fontSize: "42px",
+                    marginBottom: "15px"
+                  }}
+                >
                   What would you like to learn today?
                 </h1>
 
@@ -586,21 +599,7 @@ const {
                   Ask anything from your uploaded notes.
                 </p>
 
-                <div>
-                  • Dynamic Programming
-                </div>
 
-                <div>
-                  • Deadlock
-                </div>
-
-                <div>
-                  • Computer Networks
-                </div>
-
-                <div>
-                  • DBMS
-                </div>
 
               </div>
 
@@ -634,7 +633,10 @@ const {
                  <div
                    style={{
                      maxWidth:
-                       "80%",
+                       "900px",
+
+                     width:
+                       "fit-content",
 
                      padding:
                        "15px",
@@ -672,8 +674,31 @@ const {
                  >
                     <ReactMarkdown
                       components={{
-                        code({ children }) {
+
+                        pre({ children }) {
+
                           return (
+
+                            <pre
+                              style={{
+                                overflowX: "auto",
+                                maxWidth: "100%",
+                                background: "#f8fafc",
+                                padding: "12px",
+                                borderRadius: "8px",
+                                whiteSpace: "pre-wrap"
+                              }}
+                            >
+                              {children}
+                            </pre>
+
+                          );
+                        },
+
+                        code({ children }) {
+
+                          return (
+
                             <code
                               style={{
                                 background: "#f1f5f9",
@@ -684,8 +709,10 @@ const {
                             >
                               {children}
                             </code>
+
                           );
                         }
+
                       }}
                     >
                       {msg.content}
@@ -778,8 +805,11 @@ const {
                 loading
               }
               style={{
-                padding:
-                  "0 20px",
+                width:
+                  "100px",
+
+                fontWeight:
+                  "600",
                 border:
                   "none",
                 borderRadius:
