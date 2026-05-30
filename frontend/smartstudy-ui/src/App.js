@@ -9,7 +9,8 @@ import {
 
 import Login from "./pages/Login";
 import InterviewPage from "./pages/InterviewPage";
-
+import AIStudyAssistant
+from "./pages/AIStudyAssistant";
 import Register from "./pages/Register";
 
 import SettingsPage from "./pages/SettingsPage";
@@ -113,7 +114,12 @@ function App() {
               <UploadPage />
             }
           />
-
+<Route
+  path="/dashboard/ai-study"
+  element={
+    <AIStudyAssistant />
+  }
+/>
           {/* ROUTINE */}
 
           <Route

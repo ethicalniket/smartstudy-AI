@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosInstance from "../services/axiosInstance";
+import FloatingTimer from "../components/FloatingTimer";
 import {
   FaFilePdf,
   FaBookOpen,

@@ -121,11 +121,16 @@ function DashboardLayout() {
       icon: "📄"
     },
 
+
     {
       name: "Interview Mode",
       path: "/dashboard/interview",
       icon: "🎤"
-    }
+    },{
+        name: "AI Study Assistant",
+        path: "/dashboard/ai-study",
+        icon: "🤖"
+      }
 
   ];
 
@@ -349,8 +354,11 @@ function DashboardLayout() {
 
         <div style={pageContent}>
 
-          <Outlet />
-
+         <Outlet
+           context={{
+             sidebarOpen
+           }}
+         />
         </div>
 
       </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 function FloatingTimer() {
 
@@ -6,6 +7,11 @@ function FloatingTimer() {
 
   const [seconds, setSeconds] =
     useState(0);
+
+    const location = useLocation();
+
+    const showUI =
+      location.pathname === "/dashboard";
 
   const [targetMinutes, setTargetMinutes] =
     useState("");
@@ -116,7 +122,7 @@ function FloatingTimer() {
 
       {/* MINI FLOATING BUTTON */}
 
-      {!expanded && (
+      {showUI && !expanded && (
 
         <div
           style={floatingIcon}
@@ -139,7 +145,7 @@ function FloatingTimer() {
 
       {/* EXPANDED CARD */}
 
-      {expanded && (
+     {showUI && expanded && (
 
         <div style={floatingCard}>
 

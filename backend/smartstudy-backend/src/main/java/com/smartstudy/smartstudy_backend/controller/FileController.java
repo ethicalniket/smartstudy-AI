@@ -22,6 +22,14 @@ import com.smartstudy.smartstudy_backend.dto.QuizRequest;
 import com.smartstudy.smartstudy_backend.entity.FileChunk;
 import com.smartstudy.smartstudy_backend.repository.FileChunkRepository;
 import com.cloudinary.Cloudinary;
+import com.smartstudy.smartstudy_backend.dto.AskAllRequest;
+import com.smartstudy.smartstudy_backend.entity.ChatConversation;
+import com.smartstudy.smartstudy_backend.repository.ChatConversationRepository;
+import com.smartstudy.smartstudy_backend.entity.ChatMessage;
+import com.smartstudy.smartstudy_backend.repository.ChatMessageRepository;
+import com.smartstudy.smartstudy_backend.dto.ChatRequest;
+
+
 import com.cloudinary.utils.ObjectUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.regex.Matcher;
@@ -52,6 +60,9 @@ public class FileController {
     private final PdfService pdfService;
     private final Cloudinary cloudinary;
     private final GeminiService geminiService;
+    private final ChatConversationRepository chatConversationRepository;
+    private final ChatMessageRepository chatMessageRepository;
+
     public FileController(
             UploadedFileRepository uploadedFileRepository,
             JwtUtil jwtUtil,
@@ -60,7 +71,9 @@ public class FileController {
             PdfService pdfService,
             StudyFileRepository studyFileRepository,
             FileChunkRepository fileChunkRepository,
-            GeminiService geminiService
+            GeminiService geminiService,
+            ChatConversationRepository chatConversationRepository,
+            ChatMessageRepository chatMessageRepository
     ) {
         this.uploadedFileRepository = uploadedFileRepository;
         this.jwtUtil = jwtUtil;
@@ -70,6 +83,10 @@ public class FileController {
         this.geminiService = geminiService;
         this.fileService = fileService;
         this.cloudinary = cloudinary;
+        this.chatConversationRepository =
+                chatConversationRepository;
+        this.chatMessageRepository =
+                chatMessageRepository;
     }
 
     // =========================
@@ -654,6 +671,12 @@ when absolutely no relevant information exists.
 7. Keep response clean and easy to understand.
 8. Do NOT make up completely unrelated information.
 9. Explain in simple student-friendly language.
+10. By default answer in English.
+11. If user asks in Hindi, answer in Hindi.
+12. If user asks in Hinglish, answer in Hinglish.
+13. Follow the language explicitly requested by the user.
+14. Never return corrupted Unicode text.
+15. Format code using markdown code blocks.
 
 USER QUESTION:
 """ + request.getQuestion() +
@@ -699,6 +722,7 @@ USER QUESTION:
         }
 
     }
+
 
     // =========================
     // InterviewController API
@@ -1086,6 +1110,631 @@ QUESTION:
         }
 
     }
+    // =========================
+    // CHATBOT ASK ALL
+    // =========================
+    @PostMapping("/ask-all")
+    public ResponseEntity<?> askAllPdfs(
+            @RequestBody AskAllRequest request,
+            HttpServletRequest httpRequest
+    ) {
+
+        try {
+
+            List<FileChunk> chunks =
+                    fileChunkRepository.findAll();
+
+            String question =
+                    request.getQuestion()
+                            .toLowerCase();
+
+            List<FileChunk> relevantChunks =
+                    chunks.stream()
+
+                            .sorted((a, b) -> {
+
+                                int scoreA = 0;
+                                int scoreB = 0;
+
+                                String textA =
+                                        a.getText()
+                                                .toLowerCase();
+
+                                String textB =
+                                        b.getText()
+                                                .toLowerCase();
+
+                                for (
+                                        String word :
+                                        question.split(" ")
+                                ) {
+
+                                    if (
+                                            textA.contains(word)
+                                    ) {
+                                        scoreA++;
+                                    }
+
+                                    if (
+                                            textB.contains(word)
+                                    ) {
+                                        scoreB++;
+                                    }
+
+                                }
+
+                                return Integer.compare(
+                                        scoreB,
+                                        scoreA
+                                );
+
+                            })
+
+                            .limit(20)
+
+                            .toList();
+
+            StringBuilder context =
+                    new StringBuilder();
+
+            for (
+                    FileChunk chunk :
+                    relevantChunks
+            ) {
+
+                context.append(
+                        chunk.getText()
+                );
+
+                context.append("\n\n");
+            }
+
+            String prompt = """
+
+You are SmartStudy AI.
+
+Rules:
+
+1. By default answer in English.
+2. If user asks in Hindi, answer in Hindi.
+3. If user asks in Hinglish, answer in Hinglish.
+4. If user explicitly requests a language, use that language.
+5. Never return corrupted Unicode text.
+6. Format code using markdown code blocks.
+7. Use headings, bullet points and examples when useful.
+
+Use only the uploaded study notes.
+
+If information exists across multiple PDFs,
+combine it into one answer.
+
+
+Question:
+""" + request.getQuestion() +
+
+                    """
+    
+    Study Notes:
+    """ + context +
+
+                    """
+    
+    Answer:
+    """;
+
+            String answer =
+                    geminiService
+                            .generateContent(prompt);
+            String token =
+                    httpRequest.getHeader(
+                            "Authorization"
+                    );
+
+            token =
+                    token.replace(
+                            "Bearer ",
+                            ""
+                    );
+
+            String email =
+                    jwtUtil.extractSubject(
+                            token
+                    );
+
+            ChatConversation conversation =
+                    new ChatConversation();
+
+            conversation.setUserEmail(
+                    email
+            );
+
+            String title =
+                    request.getQuestion();
+
+            if (title.length() > 50) {
+
+                title =
+                        title.substring(
+                                0,
+                                50
+                        ) + "...";
+            }
+
+            conversation.setTitle(
+                    title
+            );
+
+            conversation =
+                    chatConversationRepository
+                            .save(conversation);
+
+            ChatMessage userMessage =
+                    new ChatMessage();
+
+            userMessage.setConversationId(
+                    conversation.getId()
+            );
+
+            userMessage.setRole(
+                    "USER"
+            );
+
+            userMessage.setContent(
+                    request.getQuestion()
+            );
+
+            chatMessageRepository
+                    .save(userMessage);
+
+            ChatMessage aiMessage =
+                    new ChatMessage();
+
+            aiMessage.setConversationId(
+                    conversation.getId()
+            );
+
+            aiMessage.setRole(
+                    "AI"
+            );
+
+            aiMessage.setContent(
+                    answer
+            );
+
+            chatMessageRepository
+                    .save(aiMessage);
+            return ResponseEntity.ok(
+                    Map.of(
+                            "answer",
+                            answer
+                    )
+            );
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return ResponseEntity
+                    .status(500)
+                    .body(
+                            Map.of(
+                                    "error",
+                                    "Failed to answer"
+                            )
+                    );
+        }
+    }
+    @GetMapping("/chat-history")
+    public ResponseEntity<?> chatHistory(
+            HttpServletRequest request
+    ) {
+
+        try {
+
+            String token =
+                    request.getHeader(
+                            "Authorization"
+                    );
+
+            token =
+                    token.replace(
+                            "Bearer ",
+                            ""
+                    );
+
+            String email =
+                    jwtUtil.extractSubject(
+                            token
+                    );
+
+            return ResponseEntity.ok(
+
+                    chatConversationRepository
+                            .findByUserEmailOrderByCreatedAtDesc(
+                                    email
+                            )
+
+            );
+
+        } catch (Exception e) {
+
+            return ResponseEntity
+                    .status(500)
+                    .body(
+                            Map.of(
+                                    "error",
+                                    "Failed"
+                            )
+                    );
+        }
+    }
+    @GetMapping("/conversations")
+    public ResponseEntity<?> conversations(
+            HttpServletRequest request
+    ) {
+
+        try {
+
+            String token =
+                    request.getHeader(
+                            "Authorization"
+                    );
+
+            token =
+                    token.replace(
+                            "Bearer ",
+                            ""
+                    );
+
+            String email =
+                    jwtUtil.extractSubject(
+                            token
+                    );
+
+            return ResponseEntity.ok(
+
+                    chatConversationRepository
+                            .findByUserEmailOrderByCreatedAtDesc(
+                                    email
+                            )
+
+            );
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return ResponseEntity
+                    .status(500)
+                    .body(
+                            Map.of(
+                                    "error",
+                                    "Failed"
+                            )
+                    );
+        }
+    }
+    @GetMapping("/conversation/{id}")
+    public ResponseEntity<?> conversation(
+            @PathVariable Long id
+    ) {
+
+        try {
+
+            return ResponseEntity.ok(
+
+                    chatMessageRepository
+                            .findByConversationIdOrderByCreatedAtAsc(
+                                    id
+                            )
+
+            );
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return ResponseEntity
+                    .status(500)
+                    .body(
+                            Map.of(
+                                    "error",
+                                    "Failed"
+                            )
+                    );
+        }
+    }
+    @Transactional
+    @DeleteMapping("/conversation/{id}")
+    public ResponseEntity<?> deleteConversation(
+            @PathVariable Long id
+    ) {
+
+        try {
+
+            chatMessageRepository
+                    .deleteByConversationId(
+                            id
+                    );
+
+            chatConversationRepository
+                    .deleteById(
+                            id
+                    );
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "message",
+                            "Deleted"
+                    )
+            );
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return ResponseEntity
+                    .status(500)
+                    .body(
+                            Map.of(
+                                    "error",
+                                    "Delete failed"
+                            )
+                    );
+        }
+    }
+    // =========================
+    // CHAT API
+    // =========================
+    @PostMapping("/chat")
+    public ResponseEntity<?> continueChat(
+            @RequestBody ChatRequest request,
+            HttpServletRequest httpRequest
+    ) {
+
+        try {
+
+            ChatConversation conversation =
+                    chatConversationRepository
+                            .findById(
+                                    request.getConversationId()
+                            )
+                            .orElseThrow(
+                                    () -> new RuntimeException(
+                                            "Conversation not found"
+                                    )
+                            );
+
+            String token =
+                    httpRequest.getHeader(
+                            "Authorization"
+                    );
+
+            token =
+                    token.replace(
+                            "Bearer ",
+                            ""
+                    );
+
+            String email =
+                    jwtUtil.extractSubject(
+                            token
+                    );
+
+            if (
+                    conversation.getUserEmail() == null
+            ) {
+
+                conversation.setUserEmail(
+                        email
+                );
+
+                chatConversationRepository
+                        .save(conversation);
+
+            }
+            else if (
+                    !conversation
+                            .getUserEmail()
+                            .equals(email)
+            ) {
+
+                return ResponseEntity
+                        .status(403)
+                        .body(
+                                Map.of(
+                                        "error",
+                                        "Access denied"
+                                )
+                        );
+            }
+
+            List<ChatMessage> oldMessages =
+                    chatMessageRepository
+                            .findByConversationIdOrderByCreatedAtAsc(
+                                    conversation.getId()
+                            );
+
+            StringBuilder history =
+                    new StringBuilder();
+
+            for (
+                    ChatMessage msg :
+                    oldMessages
+            ) {
+
+                history.append(
+                        msg.getRole()
+                );
+
+                history.append(": ");
+
+                history.append(
+                        msg.getContent()
+                );
+
+                history.append("\n");
+            }
+
+            List<FileChunk> chunks =
+                    fileChunkRepository
+                            .findAll();
+
+            String question =
+                    request.getQuestion()
+                            .toLowerCase();
+
+            List<FileChunk> relevantChunks =
+                    chunks.stream()
+
+                            .sorted((a, b) -> {
+
+                                int scoreA = 0;
+                                int scoreB = 0;
+
+                                String textA =
+                                        a.getText()
+                                                .toLowerCase();
+
+                                String textB =
+                                        b.getText()
+                                                .toLowerCase();
+
+                                for (
+                                        String word :
+                                        question.split(" ")
+                                ) {
+
+                                    if (
+                                            textA.contains(word)
+                                    ) scoreA++;
+
+                                    if (
+                                            textB.contains(word)
+                                    ) scoreB++;
+                                }
+
+                                return Integer.compare(
+                                        scoreB,
+                                        scoreA
+                                );
+
+                            })
+
+                            .limit(20)
+
+                            .toList();
+
+            StringBuilder context =
+                    new StringBuilder();
+
+            for (
+                    FileChunk chunk :
+                    relevantChunks
+            ) {
+
+                context.append(
+                        chunk.getText()
+                );
+
+                context.append("\n\n");
+            }
+
+            String prompt = """
+
+You are SmartStudy AI.
+
+Continue the conversation naturally.
+Rules:
+
+1. By default answer in English.
+2. If user asks in Hindi, answer in Hindi.
+3. If user asks in Hinglish, answer in Hinglish.
+4. If user explicitly requests a language, use that language.
+5. Never return corrupted Unicode text.
+6. Format code using markdown code blocks.
+7. Use headings and bullet points when useful.
+
+Previous Conversation:
+""" + history +
+
+                    """
+    
+    Study Notes:
+    """ + context +
+
+                    """
+    
+    User:
+    """ + request.getQuestion() +
+
+                    """
+    
+    Answer:
+    """;
+
+            String answer =
+                    geminiService
+                            .generateContent(prompt);
+
+            ChatMessage userMessage =
+                    new ChatMessage();
+
+            userMessage.setConversationId(
+                    conversation.getId()
+            );
+
+            userMessage.setRole(
+                    "USER"
+            );
+
+            userMessage.setContent(
+                    request.getQuestion()
+            );
+
+            chatMessageRepository
+                    .save(userMessage);
+
+            ChatMessage aiMessage =
+                    new ChatMessage();
+
+            aiMessage.setConversationId(
+                    conversation.getId()
+            );
+
+            aiMessage.setRole(
+                    "AI"
+            );
+
+            aiMessage.setContent(
+                    answer
+            );
+
+            chatMessageRepository
+                    .save(aiMessage);
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "answer",
+                            answer
+                    )
+            );
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return ResponseEntity
+                    .status(500)
+                    .body(
+                            Map.of(
+                                    "error",
+                                    "Chat failed"
+                            )
+                    );
+        }
+    }
+
     // =========================
     // BASIC AI SUMMARY
     // =========================

@@ -2,8 +2,9 @@
 package com.smartstudy.smartstudy_backend.entity;
 
 import jakarta.persistence.*;
-
+import java.util.List;
 import java.time.Instant;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "uploaded_files")
@@ -12,6 +13,7 @@ public class UploadedFile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     // stored UUID filename
     private String fileName;
